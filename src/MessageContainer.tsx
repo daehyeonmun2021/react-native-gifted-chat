@@ -2,28 +2,28 @@ import PropTypes from 'prop-types'
 import React, { RefObject } from 'react'
 
 import {
-  FlatList,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  ListViewProps,
   ListRenderItemInfo,
-  NativeSyntheticEvent,
+  ListViewProps,
   NativeScrollEvent,
-  StyleProp,
-  ViewStyle,
+  NativeSyntheticEvent,
   Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native'
 
+import Color from './Color'
 import { LoadEarlier, LoadEarlierProps } from './LoadEarlier'
 import Message from './Message'
-import Color from './Color'
-import { User, IMessage, Reply } from './Models'
+import { IMessage, Reply, User } from './Models'
 import TypingIndicator from './TypingIndicator'
 
-import { StylePropType } from './utils'
+import Animated, { ILayoutAnimationBuilder } from 'react-native-reanimated'
 import { warning } from './logging'
+import { StylePropType } from './utils'
 
 const styles = StyleSheet.create({
   container: {
@@ -79,7 +79,7 @@ export interface MessageContainerProps<TMessage extends IMessage> {
   invertibleScrollViewProps?: any
   extraData?: any
   scrollToBottomOffset?: number
-  forwardRef?: RefObject<FlatList<IMessage>>
+  forwardRef?: RefObject<Animated.FlatList<IMessage>>
   renderChatEmpty?(): React.ReactNode
   renderFooter?(props: MessageContainerProps<TMessage>): React.ReactNode
   renderMessage?(props: Message['props']): React.ReactNode
@@ -89,6 +89,7 @@ export interface MessageContainerProps<TMessage extends IMessage> {
   onQuickReply?(replies: Reply[]): void
   infiniteScroll?: boolean
   isLoadingEarlier?: boolean
+  itemLayoutAnimation?: ILayoutAnimationBuilder | undefined
 }
 
 interface State {
@@ -341,11 +342,12 @@ export default class MessageContainer<
           this.props.alignTop ? styles.containerAlignTop : styles.container
         }
       >
-        <FlatList
+        <Animated.FlatList
           ref={this.props.forwardRef}
           extraData={[this.props.extraData, this.props.isTyping]}
           keyExtractor={this.keyExtractor}
           enableEmptySections
+          itemLayoutAnimation={this.props.itemLayoutAnimation}
           automaticallyAdjustContentInsets={false}
           inverted={inverted}
           data={this.props.messages}

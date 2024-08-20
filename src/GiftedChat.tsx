@@ -8,11 +8,10 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 import PropTypes from 'prop-types'
 import React, { createRef, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Animated,
-  FlatList,
   KeyboardAvoidingView,
   LayoutChangeEvent,
   Platform,
+  Animated as RNAnimated,
   StyleProp,
   StyleSheet,
   TextInput,
@@ -21,6 +20,7 @@ import {
   ViewStyle,
 } from 'react-native'
 import { LightboxProps } from 'react-native-lightbox-v2'
+import Animated, { ILayoutAnimationBuilder } from 'react-native-reanimated'
 import uuid from 'uuid'
 import { Actions, ActionsProps } from './Actions'
 import { Avatar, AvatarProps } from './Avatar'
@@ -54,7 +54,7 @@ dayjs.extend(localizedFormat)
 
 export interface GiftedChatProps<TMessage extends IMessage = IMessage> {
   /* Message container ref */
-  messageContainerRef?: React.RefObject<FlatList<IMessage>>
+  messageContainerRef?: React.RefObject<Animated.FlatList<IMessage>>
   /* text input ref */
   textInputRef?: React.RefObject<TextInput>
   /* Messages to display */
@@ -135,6 +135,8 @@ export interface GiftedChatProps<TMessage extends IMessage = IMessage> {
   /* infinite scroll up when reach the top of messages container, automatically call onLoadEarlier function if exist */
   infiniteScroll?: boolean
   timeTextStyle?: LeftRightStyle<TextStyle>
+  /* layout animation */
+  itemLayoutAnimation?: ILayoutAnimationBuilder | undefined
   /* Custom action sheet */
   actionSheet?(): {
     showActionSheetWithOptions: (
@@ -223,7 +225,7 @@ export interface GiftedChatProps<TMessage extends IMessage = IMessage> {
 export interface GiftedChatState<TMessage extends IMessage = IMessage> {
   isInitialized: boolean
   composerHeight?: number
-  messagesContainerHeight?: number | Animated.Value
+  messagesContainerHeight?: number | RNAnimated.Value
   typingDisabled: boolean
   text?: string
   messages?: TMessage[]
@@ -261,7 +263,7 @@ function GiftedChat<TMessage extends IMessage = IMessage>(
     inverted = true,
     minComposerHeight = MIN_COMPOSER_HEIGHT,
     maxComposerHeight = MAX_COMPOSER_HEIGHT,
-    messageContainerRef = createRef<FlatList<IMessage>>(),
+    messageContainerRef = createRef<Animated.FlatList<IMessage>>(),
     textInputRef = createRef<TextInput>(),
   } = props
 
@@ -809,21 +811,21 @@ const styles = StyleSheet.create({
 
 export * from './Models'
 export {
-  GiftedChat,
   Actions,
   Avatar,
   Bubble,
-  SystemMessage,
-  MessageImage,
-  MessageText,
   Composer,
   Day,
+  GiftedAvatar,
+  GiftedChat,
   InputToolbar,
   LoadEarlier,
   Message,
   MessageContainer,
+  MessageImage,
+  MessageText,
   Send,
+  SystemMessage,
   Time,
-  GiftedAvatar,
   utils,
 }
